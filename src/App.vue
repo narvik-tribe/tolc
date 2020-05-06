@@ -23,6 +23,8 @@
 </template>
 
 <script>
+import quiz from './quiz.json'
+
 export default {
   name: "App",
   components: {},
@@ -41,18 +43,7 @@ export default {
   },
   data() {
     return {
-      quiz: {
-        1601: { type: "", answer: "e" },
-        1602: { type: "", answer: "a" },
-        1603: { type: "", answer: "c" },
-        1604: { type: "", answer: "a" },
-        1605: { type: "", answer: "b" },
-        1606: { type: "", answer: "e" },
-        1607: { type: "", answer: "c" },
-        1608: { type: "", answer: "d" },
-        1609: { type: "", answer: "e" },
-        1610: { type: "", answer: "b" },
-      },
+      quiz: quiz,
       quiz_number: undefined,
       current_quiz: undefined,
       answer: undefined,
