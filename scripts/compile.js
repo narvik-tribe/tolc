@@ -1,7 +1,6 @@
-const s = `
-eacabecdeb 
-ecbcbdacce
-`
+const fs = require('fs')
+
+const s = fs.readFileSync('./raw.txt', {encoding:'utf-8'})
 
 const lst = s.split('\n')
 let row = 1601
@@ -18,5 +17,4 @@ for (let line of lst) {
   row += 10
 }
 
-const fs = require('fs')
 fs.writeFileSync('../src/quiz.json', JSON.stringify(dict))

@@ -1,22 +1,25 @@
 <template>
   <div id="app">
-    <div style="float: left; margin-left: 100px" :class="maybe_disabled">
-      <input style="float: left; margin-right: 5px; max-width: 50px" ref="inp" id="inp" @input="f" v-model="quiz_number"/>
-      <span style="float: left; margin-right: 30px;" v-if="current_quiz">{{quiz[current_quiz].type}}</span>
-      <div style="float: left" v-show="current_quiz !== undefined">
-        <label for="a">A</label>
-        <input style="; margin-right: 10px" type="radio" id="a" value="a" v-model="answer" />
-        <label for="b">B</label>
-        <input style="; margin-right: 10px" type="radio" id="b" value="b" v-model="answer" />
-        <label for="c">C</label>
-        <input style="; margin-right: 10px" type="radio" id="c" value="c" v-model="answer" />
-        <label for="d">D</label>
-        <input style="; margin-right: 10px" type="radio" id="d" value="d" v-model="answer" />
-        <label for="e">E</label>
-        <input style="; margin-right: 30px" type="radio" id="e" value="e" v-model="answer" />
+    <div style="float: left; margin-left: 100px">
+      <select v-model="selected" style="display: block; margin-bottom: 10px" @change="clear_answer">
+        <option disabled value="">Category</option>
+        <option v-for="cat in categories" :key="cat.code" :value="cat.code">{{cat.name}}</option>
+      </select>
 
-        <span style="color: green;" v-if="current_quiz && answer === quiz[current_quiz].answer">OK</span>
-        <span style="color: red;" v-else-if="answer !== undefined">NO</span>
+      <div v-for="item in filtered" :key="item.id" style="margin-bottom: 5px" :class="maybe_disabled[item.id]">
+        <span style="margin-right: 15px">{{item.id}}</span>
+        <label for="a">A</label>
+        <input style="; margin-right: 10px" type="radio" id="a" value="a" v-model="answer[item.id]" @change="evaluate(item.id)"/>
+        <label for="b">B</label>
+        <input style="; margin-right: 10px" type="radio" id="b" value="b" v-model="answer[item.id]" @change="evaluate(item.id)"/>
+        <label for="c">C</label>
+        <input style="; margin-right: 10px" type="radio" id="c" value="c" v-model="answer[item.id]" @change="evaluate(item.id)"/>
+        <label for="d">D</label>
+        <input style="; margin-right: 10px" type="radio" id="d" value="d" v-model="answer[item.id]" @change="evaluate(item.id)"/>
+        <label for="e">E</label>
+        <input style="; margin-right: 30px" type="radio" id="e" value="e" v-model="answer[item.id]" @change="evaluate(item.id)"/>
+
+        <span style="color: green">{{answ_label(answer[item.id] === item.answer, answer[item.id])}}</span>
       </div>
     </div>
   </div>
@@ -24,41 +27,62 @@
 
 <script>
 import quiz from './quiz.json'
+import categories from './categories.json'
 
 export default {
   name: "App",
-  components: {},
-  watch: {
-    answer: function (current) {
-      if (this.current_quiz && current !== this.quiz[this.current_quiz].answer) {
-        this.maybe_disabled = 'disabled'
-        setTimeout(() => {
-          this.maybe_disabled = ''
-          this.$refs['inp'].focus()
-        }, 3000)
-      } else {
-        this.$refs['inp'].focus()
-      }
+  computed: {
+    filtered() {
+      return Object
+        .keys(this.quiz)
+        .filter(id => this.quiz[id].type === this.selected)
+        .map(id => ({id, answer: this.quiz[id].answer}))
     }
   },
   data() {
     return {
-      quiz: quiz,
+      answer: {},  // id: a..e
+      selected: 'a',
+      categories,
+      quiz,
       quiz_number: undefined,
       current_quiz: undefined,
-      answer: undefined,
-      maybe_disabled: '',
+      // answer: undefined,
+      maybe_disabled: {},
     };
   },
+  mounted() {
+    if ('result' in window.localStorage) {
+      return
+    }
+    window.localStorage.setItem('result', '{}')
+  },
   methods: {
-    f() {
-      this.current_quiz = undefined
-      this.answer = undefined
-
-      if (this.quiz_number in this.quiz) {
-        this.current_quiz = this.quiz_number
-      } 
+    answ_label(b, exists) {
+      return b 
+        ? 'OK' 
+        : exists ? '___' : '.....'
     },
+    clear_answer() {
+      this.answer = {}
+    },
+    evaluate(id) {
+      if (this.answer[id] !== this.quiz[id].answer) {
+        const result = JSON.parse(window.localStorage.getItem('result'))
+        if (!(id in result)) {
+          result[id] = 0
+        }
+        result[id]++
+        window.localStorage.setItem('result', JSON.stringify(result))
+
+        this.$set(this.maybe_disabled, id, 'disabled')
+        this.maybe_disabled[id] = 'disabled'
+        const THIS = this
+        setTimeout(() => {
+          THIS.$set(THIS.maybe_disabled, id, '')
+        }, 15000)
+      }
+    }
   }
 };
 </script>
