@@ -12,9 +12,15 @@ for (let line of lst) {
     continue
   }
   for (let i=0; i<10; i++) {
-    dict[row+i] = { type: "", answer: line[i] }
+    dict[row+i] = line[i]
   }
   row += 10
 }
 
-fs.writeFileSync('../src/quiz.json', JSON.stringify(dict))
+const arr = Object.keys(dict).map(id => {
+  return `  "${id}": {"type": "", "answer": "${dict[id]}"}`
+})
+
+const all = `{\n${arr.join(',\n')}\n}`
+
+fs.writeFileSync('../src/quiz.json', all)

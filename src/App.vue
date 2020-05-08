@@ -6,7 +6,7 @@
         <option v-for="cat in categories" :key="cat.code" :value="cat.code">{{cat.name}}</option>
       </select>
 
-      <div v-for="item in filtered" :key="item.id" style="margin-bottom: 5px" :class="maybe_disabled[item.id]">
+      <div v-for="item in filtered" :key="item.id" style="margin-bottom: 5px; text-align: left" :class="maybe_disabled[item.id]">
         <span style="margin-right: 15px">{{item.id}}</span>
         <label for="a">A</label>
         <input style="; margin-right: 10px" type="radio" id="a" value="a" v-model="answer[item.id]" @change="evaluate(item.id)"/>
@@ -19,7 +19,10 @@
         <label for="e">E</label>
         <input style="; margin-right: 30px" type="radio" id="e" value="e" v-model="answer[item.id]" @change="evaluate(item.id)"/>
 
-        <span style="color: green">{{answ_label(answer[item.id] === item.answer, answer[item.id])}}</span>
+        <span :style="answ_style(answer[item.id] === item.answer, answer[item.id])">
+          {{answ_label(answer[item.id] === item.answer, answer[item.id])}}
+        </span>
+        {{storage[item.id] ? '(' + '*'.repeat(storage[item.id]) + ')' : ''}}
       </div>
     </div>
   </div>
@@ -49,31 +52,38 @@ export default {
       current_quiz: undefined,
       // answer: undefined,
       maybe_disabled: {},
+      storage: undefined,
     };
   },
   mounted() {
     if ('result' in window.localStorage) {
+      this.storage = JSON.parse(window.localStorage.getItem('result'))
       return
     }
     window.localStorage.setItem('result', '{}')
+    this.storage = {}
   },
   methods: {
     answ_label(b, exists) {
       return b 
         ? 'OK' 
-        : exists ? '___' : '.....'
+        : exists ? 'NO' : '.....'
+    },
+    answ_style(b, exists) {
+      return b 
+        ? 'color: green' 
+        : exists ? 'color: orange' : 'color: black'
     },
     clear_answer() {
       this.answer = {}
     },
     evaluate(id) {
       if (this.answer[id] !== this.quiz[id].answer) {
-        const result = JSON.parse(window.localStorage.getItem('result'))
-        if (!(id in result)) {
-          result[id] = 0
+        if (!(id in this.storage)) {
+          this.storage[id] = 0
         }
-        result[id]++
-        window.localStorage.setItem('result', JSON.stringify(result))
+        this.storage[id]++
+        window.localStorage.setItem('result', JSON.stringify(this.storage))
 
         this.$set(this.maybe_disabled, id, 'disabled')
         this.maybe_disabled[id] = 'disabled'
