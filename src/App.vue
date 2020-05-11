@@ -1,12 +1,18 @@
 <template>
   <div id="app">
-    <div style="float: left; margin-left: 100px">
+    <div style="float: left; margin-left: 100px; margin-bottom: 100px;">
       <select v-model="selected" style="display: block; margin-bottom: 10px" @change="clear_answer">
         <option disabled value="">Category</option>
         <option v-for="cat in categories" :key="cat.code" :value="cat.code">{{cat.name}}</option>
       </select>
 
-      <div v-for="item in filtered" :key="item.id" style="margin-bottom: 5px; text-align: left" :class="maybe_disabled[item.id]">
+      <div 
+        v-for="item in filtered"
+        :key="item.id"
+        style="margin-bottom: 5px; text-align: left"
+        :class="maybe_disabled[item.id]"
+        :style="maybe_last(item.id)"
+      >
         <span style="margin-right: 15px">{{item.id}}</span>
         <label for="a">A</label>
         <input style="; margin-right: 10px" type="radio" id="a" value="a" v-model="answer[item.id]" @change="evaluate(item.id)"/>
@@ -45,7 +51,7 @@ export default {
   data() {
     return {
       answer: {},  // id: a..e
-      selected: 'a',
+      selected: undefined,
       categories,
       quiz,
       quiz_number: undefined,
@@ -53,17 +59,23 @@ export default {
       // answer: undefined,
       maybe_disabled: {},
       storage: undefined,
+      last: undefined,
     };
   },
   mounted() {
-    if ('result' in window.localStorage) {
-      this.storage = JSON.parse(window.localStorage.getItem('result'))
-      return
+    if (!('result' in window.localStorage)) {
+      window.localStorage.setItem('result', '{}')
     }
-    window.localStorage.setItem('result', '{}')
-    this.storage = {}
+    if (!('last' in window.localStorage)) {
+      window.localStorage.setItem('last', '{}')
+    }
+    this.storage = JSON.parse(window.localStorage.getItem('result'))
+    this.last = JSON.parse(window.localStorage.getItem('last'))
   },
   methods: {
+    maybe_last(id) {
+      return id === this.last[this.selected] ? 'border-style: solid; border-width: thin;' : ''
+    },
     answ_label(b, exists) {
       return b 
         ? 'OK' 
@@ -78,6 +90,9 @@ export default {
       this.answer = {}
     },
     evaluate(id) {
+      this.last[this.selected] = id
+      window.localStorage.setItem('last', JSON.stringify(this.last))
+      
       if (this.answer[id] !== this.quiz[id].answer) {
         if (!(id in this.storage)) {
           this.storage[id] = 0

@@ -1,13 +1,13 @@
 [
   {"name": "numeri e operazioni", "code": "1"},
-  {"name": "algebra", "code": "2"},
-  {"name": "radicali", "code": "3"},
-  {"name": "equazioni", "code": "4"},
-  {"name": "disequazioni", "code": "5"},
-  {"name": "logaritmi", "code": "6"},
-  {"name": "rette - geometria analitica", "code": "7"},
-  {"name": "funzioni", "code": "8"},
-  {"name": "probabilità", "code": "10"},
-  {"name": "geometria piana", "code": "11"},
-  {"name": "NO", "code": "NO"}
+  {"name": "algebra",             "code": "2"},
+  {"name": "radicali",            "code": "3"},
+  {"name": "equazioni",           "code": "4"},
+  {"name": "disequazioni",        "code": "5"},
+  {"name": "logaritmi",           "code": "6"},
+  {"name": "geometria analitica", "code": "7"},
+  {"name": "funzioni",            "code": "8"},
+  {"name": "probabilità",         "code": "10"},
+  {"name": "geometria elementare","code": "11"},
+  {"name": "NO",                  "code": "NO"}
 ]
